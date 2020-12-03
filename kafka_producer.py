@@ -14,7 +14,7 @@ class KafkaProducr:
         try:
             return pd.read_csv(self.location)
         except Exception as ex:
-            raise ValueError('Error with read_json function ', ex)
+            raise ValueError('Error with read_csv function ', ex)
 
     def send_message(self, data):
         self.producer_client.send(self.topic, data.encode('utf-8') )
