@@ -1,0 +1,20 @@
+# Use an official Python runtime as a base image
+FROM python:3.7-slim
+LABEL authors="Aswin Ramakrishnan"
+
+# Set the working directory to /app
+WORKDIR /app
+# Copy the current directory contents into the container at /app
+ADD . /app
+
+#Satisfy preconditions for installing cryptography
+RUN apt-get update
+RUN apt-get install build-essential libssl-dev manpages-dev zip unzip libffi-dev python-dev -y
+
+# Install any needed packages specified in requirements.txt
+# RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --default-timeout=120 --trusted-host pypi.org --trusted-host files.pythonhosted.org
+RUN ["chmod", "+x", "./package.sh"]
+
+# Run kafka_consumer.py when the container launches
+CMD ["python", "kafka_producer.py","--client_id","tsla.part_1","--kafka_topic","part_1","--app_name","part_1","--group_id","part_1.grp.1","--batch_size","10"]
