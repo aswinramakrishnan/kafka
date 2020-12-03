@@ -11,15 +11,21 @@ class KafkaProducr:
         self.producer_client = KafkaProducer(bootstrap_servers=self.bootstrap_servers)
 
     def read_csv(self):
-        return pd.read_csv(self.location)
+        try:
+            return pd.read_csv(self.location)
+        except Exception as ex:
+            raise ValueError('Error with read_json function ', ex)
 
     def send_message(self, data):
         self.producer_client.send(self.topic, data.encode('utf-8') )
         self.producer_client.flush()
 
     def kafka_producer(self):
-        df = self.read_csv()
-        df.apply(lambda x: self.send_message( json.dumps(x.to_json())), axis=1)
+        try:
+            df = self.read_csv()
+            df.apply(lambda x: self.send_message(json.dumps(x.to_json())), axis=1)
+        except Exception as ex:
+            raise ValueError('Error with kafka_producer function ', ex)
 
 if __name__ == '__main__':
     # Could be stored in config.json file
@@ -30,7 +36,7 @@ if __name__ == '__main__':
     try:
         kpc = KafkaProducr(location, bootstrap_servers,topic)
         kpc.kafka_producer()
-    except Exception as e:
-        print('Error with producer and send to slack/email')
-    print('sent')
+        print('sent')
+    except Exception as ex:
+        raise ValueError('Error with producer and send to slack/email',ex)
 
